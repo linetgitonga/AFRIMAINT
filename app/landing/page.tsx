@@ -1,7 +1,7 @@
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
 
 export default function LandingPage() {
   return (
@@ -20,11 +20,11 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             
-            <Button size="lg" className="text-lg px-8 py-3" href="/">
-              Get Started
+            <Button asChild size="lg" className="text-lg px-8 py-3">
+              <Link href="/">Get Started</Link>
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 py-3" href="/learn-more">
-              Learn More
+            <Button asChild variant="outline" size="lg" className="text-lg px-8 py-3">
+              <Link href="#how-it-works">Learn More</Link>
             </Button>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default function LandingPage() {
             Why Choose African Maintenance?
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Our AI-powered platform delivers unparalleled accuracy in machine fault detection, tailored for African industrial environments.
+            Our AI-powered platform is built for accurate machine fault detection, tailored for African industrial environments.
           </p>
         </div>
 
@@ -93,7 +93,7 @@ export default function LandingPage() {
             </CardHeader>
             <CardContent>
               <CardDescription>
-                Reduce maintenance costs by up to 40% through predictive maintenance and optimized resource allocation.
+                Reduce maintenance costs through predictive maintenance and optimized resource allocation.
               </CardDescription>
             </CardContent>
           </Card>
@@ -129,7 +129,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="bg-white dark:bg-gray-900 py-16">
+      <section id="how-it-works" className="bg-white dark:bg-gray-900 py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
@@ -181,7 +181,7 @@ export default function LandingPage() {
             Ready to Transform Your Maintenance Strategy?
           </h2>
           <p className="text-xl mb-8 opacity-90">
-            Join leading African industries in adopting AI-powered predictive maintenance.
+            Bring AI-powered predictive maintenance to your operation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-3">
@@ -193,51 +193,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">African Maintenance</h3>
-              <p className="text-gray-400">
-                AI-powered predictive maintenance solutions for African industries.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Solutions</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>Manufacturing</li>
-                <li>Mining</li>
-                <li>Processing</li>
-                <li>Energy</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>About Us</li>
-                <li>Careers</li>
-                <li>Blog</li>
-                <li>Contact</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>Documentation</li>
-                <li>Help Center</li>
-                <li>API Reference</li>
-                <li>Status</li>
-              </ul>
-            </div>
-          </div>
-          <Separator className="my-8 bg-gray-800" />
-          <div className="text-center text-gray-400">
-            <p>&copy; 2025 African Maintenance. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
