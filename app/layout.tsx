@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import { SiteFooter } from "@/components/site-footer"
+import { CookieConsentBanner } from "@/components/cookie-consent-banner"
 import { Suspense } from "react"
 import { getSiteBaseUrl, siteConfig } from "@/lib/site-config"
 import "./globals.css"
@@ -41,6 +42,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
             {children}
             <SiteFooter />
+            <CookieConsentBanner />
           </ThemeProvider>
         </Suspense>
         <Analytics />

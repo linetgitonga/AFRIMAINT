@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: afrimaint_postgres_local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: afrimaint
+      POSTGRES_PASSWORD: afrimaint_dev_password
+      POSTGRES_DB: afrimaint
+    ports:
+      - "5433:5432"
+    volumes:
+      - afrimaint_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  afrimaint_postgres_data:

@@ -1,0 +1,309 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  MANAGER
+  TECHNICIAN
+  FINANCE
+  ADMIN
+  VENDOR_ANALYST
+}
+
+enum MachineStatus {
+  HEALTHY
+  ATTENTION
+  CRITICAL
+}
+
+enum AlertSeverity {
+  OK
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+enum WorkOrderStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum WorkOrderPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  country   String   @default("Kenya")
+  currency  String   @default("KES")
+  timezone  String   @default("Africa/Nairobi")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users        User[]
+  machines     Machine[]
+  costMatrices CostMatrix[]
+  auditLogs    AuditLog[]
+
+  @@map("organizations")
+}
+
+model User {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  email          String       @unique
+  phone          String?
+  passwordHash   String
+  role           UserRole
+  locale         String       @default("en")
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  assignedWorkOrders WorkOrder[]   @relation("AssignedTechnician")
+  auditLogs          AuditLog[]
+  chatMessages       ChatMessage[]
+
+  @@index([organizationId])
+  @@map("users")
+}
+
+model Machine {
+  id               String        @id @default(cuid())
+  organizationId   String
+  organization     Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name             String
+  code             String
+  location         String
+  type             String
+  status           MachineStatus @default(HEALTHY)
+  installationDate DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  sensorReadings  SensorReading[]
+  failureEvents   FailureEvent[]
+  predictions     Prediction[]
+  rulPredictions  RulPrediction[]
+  alerts          Alert[]
+  workOrders      WorkOrder[]
+  economicReports EconomicReport[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@map("machines")
+}
+
+model SensorReading {
+  id                 String   @id @default(cuid())
+  machineId          String
+  machine            Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  timestamp          DateTime @default(now())
+  airTemperature     Float
+  processTemperature Float
+  rotationalSpeed    Float
+  torque             Float
+  toolWear           Float
+
+  @@index([machineId, timestamp])
+  @@map("sensor_readings")
+}
+
+model FailureEvent {
+  id            String   @id @default(cuid())
+  machineId     String
+  machine       Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  occurredAt    DateTime
+  failureType   String
+  downtimeHours Float
+  costKsh       Float
+  createdAt     DateTime @default(now())
+
+  @@index([machineId])
+  @@map("failure_events")
+}
+
+model ModelVersion {
+  id        String    @id @default(cuid())
+  name      String
+  type      String
+  path      String?
+  metrics   Json?
+  trainedAt DateTime?
+  isActive  Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  predictions Prediction[]
+
+  @@map("model_versions")
+}
+
+model Prediction {
+  id                 String        @id @default(cuid())
+  machineId          String
+  machine            Machine       @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  timestamp          DateTime      @default(now())
+  failureProbability Float
+  threshold          Float
+  modelVersionId     String?
+  modelVersion       ModelVersion? @relation(fields: [modelVersionId], references: [id])
+
+  alerts Alert[]
+
+  @@index([machineId, timestamp])
+  @@map("predictions")
+}
+
+model RulPrediction {
+  id         String   @id @default(cuid())
+  machineId  String
+  machine    Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  timestamp  DateTime @default(now())
+  rulHours   Float
+  drift      Float
+  diffusion  Float
+  confidence Float
+
+  @@index([machineId, timestamp])
+  @@map("rul_predictions")
+}
+
+model Alert {
+  id           String        @id @default(cuid())
+  machineId    String
+  machine      Machine       @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  predictionId String?
+  prediction   Prediction?   @relation(fields: [predictionId], references: [id])
+  severity     AlertSeverity
+  message      String
+  status       AlertStatus   @default(OPEN)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  workOrders WorkOrder[]
+
+  @@index([machineId])
+  @@map("alerts")
+}
+
+model WorkOrder {
+  id                   String            @id @default(cuid())
+  machineId            String
+  machine              Machine           @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  alertId              String?
+  alert                Alert?            @relation(fields: [alertId], references: [id])
+  assignedTechnicianId String?
+  assignedTechnician   User?             @relation("AssignedTechnician", fields: [assignedTechnicianId], references: [id])
+  priority             WorkOrderPriority @default(MEDIUM)
+  status               WorkOrderStatus   @default(SCHEDULED)
+  scheduledFor         DateTime?
+  completedAt          DateTime?
+  notes                String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+
+  economicReports EconomicReport[]
+
+  @@index([machineId])
+  @@index([assignedTechnicianId])
+  @@map("work_orders")
+}
+
+model CostMatrix {
+  id                    String       @id @default(cuid())
+  organizationId        String
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name                  String       @default("Default")
+  hourlyUnits           Float
+  profitPerUnitKsh      Float
+  dailyWageKsh          Float
+  shiftHours            Float
+  emergencyPartsCostKsh Float
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+
+  economicReports EconomicReport[]
+
+  @@index([organizationId])
+  @@map("cost_matrices")
+}
+
+model EconomicReport {
+  id                           String     @id @default(cuid())
+  machineId                    String
+  machine                      Machine    @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  workOrderId                  String?
+  workOrder                    WorkOrder? @relation(fields: [workOrderId], references: [id])
+  costMatrixId                 String
+  costMatrix                   CostMatrix @relation(fields: [costMatrixId], references: [id])
+  runToFailureLossKsh          Float
+  predictiveMaintenanceCostKsh Float
+  netSavingsKsh                Float
+  createdAt                    DateTime   @default(now())
+
+  @@index([machineId])
+  @@map("economic_reports")
+}
+
+model AuditLog {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String?
+  user           User?        @relation(fields: [userId], references: [id])
+  action         String
+  entityType     String
+  entityId       String?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+
+  @@index([organizationId])
+  @@map("audit_logs")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("chat_messages")
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  email     String
+  company   String?
+  message   String
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+
+  @@map("leads")
+}

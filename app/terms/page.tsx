@@ -1,15 +1,17 @@
 import type { Metadata } from "next"
+import { Breadcrumbs } from "@/components/breadcrumbs"
 import { PlaceholderNotice } from "@/components/placeholder-notice"
 import { siteConfig } from "@/lib/site-config"
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | AfriMaint",
+  title: "Terms & Conditions",
   description: "The terms governing use of AfriMaint's predictive maintenance service, subscriptions, and website.",
 }
 
 export default function TermsPage() {
   return (
     <main className="container mx-auto max-w-3xl px-4 py-16">
+      <Breadcrumbs items={[{ label: "Terms & Conditions" }]} />
       <h1 className="text-4xl font-bold mb-2">Terms & Conditions</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: <PlaceholderNotice>[NEEDS REAL DATE]</PlaceholderNotice></p>
 

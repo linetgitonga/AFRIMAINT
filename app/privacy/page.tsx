@@ -1,9 +1,10 @@
 import type { Metadata } from "next"
+import { Breadcrumbs } from "@/components/breadcrumbs"
 import { PlaceholderNotice } from "@/components/placeholder-notice"
 import { siteConfig } from "@/lib/site-config"
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | AfriMaint",
+  title: "Privacy Policy",
   description:
     "How AfriMaint collects, uses, and protects personal data, including compliance with Kenya's Data Protection Act 2019 and GDPR-baseline rights for international visitors.",
 }
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <main className="container mx-auto max-w-3xl px-4 py-16">
+      <Breadcrumbs items={[{ label: "Privacy Policy" }]} />
       <h1 className="text-4xl font-bold mb-2">Privacy Policy</h1>
       <p className="text-sm text-muted-foreground mb-10">Last updated: <PlaceholderNotice>[NEEDS REAL DATE]</PlaceholderNotice></p>
 

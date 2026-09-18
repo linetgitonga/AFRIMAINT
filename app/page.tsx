@@ -1,503 +1,265 @@
-"use client"
-
-import { useState } from "react"
+import type { Metadata } from "next"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Activity,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  DollarSign,
-  Factory,
-  Moon,
-  Settings,
-  Sun,
-  TrendingUp,
-  Wrench,
-  Zap,
-} from "lucide-react"
-import { useTheme } from "next-themes"
+import { FaqAccordion } from "@/components/faq-accordion"
+import { CaseStudyCard } from "@/components/case-study-card"
+import { StickyMobileCta } from "@/components/sticky-mobile-cta"
+import { siteConfig } from "@/lib/site-config"
 
-// Mock data for demonstration
-const machines = [
+export const metadata: Metadata = {
+  title: "AfriMaint — AI Predictive Maintenance for African Manufacturers",
+  description:
+    "Predict machine failures before they happen. AfriMaint brings AI-powered predictive maintenance to African manufacturing, mining, and processing industries.",
+}
+
+const faqs = [
   {
-    id: 1,
-    name: "Injection Molding Machine A",
-    status: "healthy",
-    health: 92,
-    nextMaintenance: "12 days",
-    location: "Production Floor 1",
-    temperature: 68,
-    vibration: "Normal",
-    lastService: "2024-01-15",
+    question: "What does AfriMaint actually predict?",
+    answer:
+      "AfriMaint analyzes sensor data (temperature, vibration, tool wear, and similar signals) to estimate the probability of failure and the remaining useful life of a machine, so maintenance can be scheduled before a breakdown happens.",
   },
   {
-    id: 2,
-    name: "CNC Lathe B",
-    status: "attention",
-    health: 73,
-    nextMaintenance: "3 days",
-    location: "Production Floor 2",
-    temperature: 82,
-    vibration: "Elevated",
-    lastService: "2023-12-20",
+    question: "Do I need to already have sensors installed?",
+    answer:
+      "No. Part of onboarding is helping you identify which machines and signals matter most and getting sensors deployed on them.",
   },
   {
-    id: 3,
-    name: "Hydraulic Press C",
-    status: "critical",
-    health: 45,
-    nextMaintenance: "Overdue",
-    location: "Production Floor 1",
-    temperature: 95,
-    vibration: "High",
-    lastService: "2023-11-10",
+    question: "How does AfriMaint handle machines with little failure history?",
+    answer:
+      "We use statistical and generative modeling techniques to work with limited historical data, and accuracy improves as more real operating data is collected from your machines over time.",
   },
   {
-    id: 4,
-    name: "Conveyor System D",
-    status: "healthy",
-    health: 88,
-    nextMaintenance: "8 days",
-    location: "Assembly Line",
-    temperature: 72,
-    vibration: "Normal",
-    lastService: "2024-01-20",
+    question: "Does AfriMaint work with unreliable power or internet connectivity?",
+    answer:
+      "The product is being built with offline-first, low-bandwidth use in mind, since that's the operating reality for many African manufacturers — this is an active area of development.",
+  },
+  {
+    question: "What does it cost?",
+    answer:
+      "Pricing depends on the number of machines and sensors involved. Reach out through our contact page and we'll walk through it with you directly.",
   },
 ]
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "healthy":
-      return "bg-green-500"
-    case "attention":
-      return "bg-yellow-500"
-    case "critical":
-      return "bg-red-500"
-    default:
-      return "bg-gray-500"
-  }
-}
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case "healthy":
-      return <CheckCircle className="h-4 w-4" />
-    case "attention":
-      return <AlertTriangle className="h-4 w-4" />
-    case "critical":
-      return <AlertTriangle className="h-4 w-4" />
-    default:
-      return <Activity className="h-4 w-4" />
-  }
-}
-
-export default function AfriMaintDashboard() {
-  const { theme, setTheme } = useTheme()
-  const [selectedMachine, setSelectedMachine] = useState(machines[0])
-
-  const healthyMachines = machines.filter((m) => m.status === "healthy").length
-  const attentionMachines = machines.filter((m) => m.status === "attention").length
-  const criticalMachines = machines.filter((m) => m.status === "critical").length
-
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Factory className="h-8 w-8 text-primary" />
-                <div>
-                  <h1 className="text-2xl font-bold text-foreground">AfriMaint</h1>
-                  <p className="text-sm text-muted-foreground">AI Predictive Maintenance</p>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pb-20 dark:from-green-950 dark:to-blue-950 md:pb-0">
+      {/* Hero Section — above the fold */}
+      <section className="container mx-auto px-4 py-16 md:py-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <Badge variant="secondary" className="mb-4">
+            AI-Powered Maintenance Solutions
+          </Badge>
+          <h1 className="mb-6 text-4xl font-bold text-gray-900 dark:text-white md:text-6xl">
+            Predictive maintenance built for African industry
+          </h1>
+          <p className="mb-8 text-xl text-gray-600 dark:text-gray-300 md:text-2xl">
+            AfriMaint helps manufacturers catch machine failures before they cause downtime — with predictions
+            translated into real Kenyan Shilling cost impact, not just an anomaly score.
+          </p>
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <Button asChild size="lg" className="px-8 py-3 text-lg">
+              <Link href="/contact">Talk to us</Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="px-8 py-3 text-lg">
+              <Link href="#how-it-works">See how it works</Link>
+            </Button>
+          </div>
+          <p className="mt-6 text-sm text-gray-500 dark:text-gray-400">
+            {siteConfig.responseTimePromise}
+          </p>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-12 text-center">
+          <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+            Why manufacturers choose AfriMaint
+          </h2>
+          <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+            Built for accurate machine fault detection, tailored for African industrial environments.
+          </p>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🤖</span>
+                AI-Powered Detection
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Machine learning models analyze vibration, temperature, and wear data to flag maintenance needs
+                before failures occur.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🏭</span>
+                Industry Optimized
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Designed for African manufacturing, mining, and processing industries, with local environmental
+                considerations in mind.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">⚡</span>
+                Real-Time Monitoring
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Continuous monitoring with alerts intended to minimize downtime and support proactive scheduling.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">💰</span>
+                Cost Translated to KSH
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Predictions are translated into Kenyan Shilling cost impact, so decisions can be made in financial
+                terms, not just technical ones.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">🌍</span>
+                Local Context
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Built with an understanding of local power, connectivity, and operational realities in mind.
+              </CardDescription>
+            </CardContent>
+          </Card>
+
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <span className="text-2xl">📊</span>
+                Actionable Dashboards
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <CardDescription>
+                Dashboards and reports built to support day-to-day maintenance and operational decision-making.
+              </CardDescription>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="how-it-works" className="bg-white py-16 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">How It Works</h2>
+            <p className="mx-auto max-w-2xl text-lg text-gray-600 dark:text-gray-300">
+              Simple, powerful, and effective maintenance prediction in three steps.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900">
+                <span className="text-2xl font-bold text-green-600 dark:text-green-400">1</span>
               </div>
+              <h3 className="mb-2 text-xl font-semibold">Install Sensors</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Deploy sensors on your machinery to collect real-time data on vibration, temperature, and
+                performance.
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="icon"
-                aria-label="Toggle theme"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-              <Button variant="outline" size="icon" aria-label="Settings">
-                <Settings className="h-4 w-4" />
-              </Button>
+
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+                <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">2</span>
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">AI Analysis</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Models continuously analyze the data to detect anomalies and estimate failure risk.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900">
+                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
+              </div>
+              <h3 className="mb-2 text-xl font-semibold">Take Action</h3>
+              <p className="text-gray-600 dark:text-gray-300">
+                Receive alerts and recommendations, so maintenance can be scheduled proactively.
+              </p>
             </div>
           </div>
         </div>
-      </header>
+      </section>
 
-      <div className="container mx-auto px-4 py-6">
-        {/* Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Machines</CardTitle>
-              <Factory className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{machines.length}</div>
-              <p className="text-xs text-muted-foreground">Active production units</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Healthy</CardTitle>
-              <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{healthyMachines}</div>
-              <p className="text-xs text-muted-foreground">Operating normally</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Need Attention</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{attentionMachines}</div>
-              <p className="text-xs text-muted-foreground">Maintenance soon</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Critical</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{criticalMachines}</div>
-              <p className="text-xs text-muted-foreground">Immediate action</p>
-            </CardContent>
-          </Card>
+      {/* Case Study Section (placeholder-scaffolded) */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="mb-8 text-center">
+          <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">Results</h2>
         </div>
+        <div className="mx-auto max-w-2xl">
+          <CaseStudyCard />
+        </div>
+      </section>
 
-        {/* Critical Alerts */}
-        {criticalMachines > 0 && (
-          <Alert className="mb-6 border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950">
-            <AlertTriangle className="h-4 w-4 text-red-600" />
-            <AlertDescription className="text-red-800 dark:text-red-200">
-              <strong>Critical Alert:</strong> {criticalMachines} machine(s) require immediate attention. Check
-              Hydraulic Press C - maintenance overdue by 5 days.
-            </AlertDescription>
-          </Alert>
-        )}
+      {/* FAQ Section */}
+      <section className="bg-white py-16 dark:bg-gray-900">
+        <div className="container mx-auto max-w-3xl px-4">
+          <h2 className="mb-8 text-center text-3xl font-bold text-gray-900 dark:text-white md:text-4xl">
+            Frequently Asked Questions
+          </h2>
+          <FaqAccordion items={faqs} />
+        </div>
+      </section>
 
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="machines">Machines</TabsTrigger>
-            <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          </TabsList>
+      {/* CTA Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="rounded-2xl bg-gradient-to-r from-green-600 to-blue-600 p-8 text-center text-white md:p-12">
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl">Ready to Transform Your Maintenance Strategy?</h2>
+          <p className="mb-8 text-xl opacity-90">Bring AI-powered predictive maintenance to your operation.</p>
+          <div className="flex flex-col justify-center gap-4 sm:flex-row">
+            <Button asChild size="lg" variant="secondary" className="px-8 py-3 text-lg">
+              <Link href="/contact">Talk to sales</Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="border-white px-8 py-3 text-lg text-white hover:bg-white hover:text-green-600"
+            >
+              <Link href="/about">Learn about us</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
 
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Machine Health Overview */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Machine Health Status</CardTitle>
-                  <CardDescription>Real-time health monitoring of all production equipment</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {machines.map((machine) => (
-                    <div key={machine.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${getStatusColor(machine.status)}`} />
-                        <div>
-                          <p className="font-medium text-sm">{machine.name}</p>
-                          <p className="text-xs text-muted-foreground">{machine.location}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium">{machine.health}%</p>
-                        <p className="text-xs text-muted-foreground">{machine.nextMaintenance}</p>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Upcoming Maintenance */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Upcoming Maintenance</CardTitle>
-                  <CardDescription>Scheduled maintenance based on AI predictions</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center gap-3 p-3 border rounded-lg bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800">
-                    <Clock className="h-4 w-4 text-red-600" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">Hydraulic Press C</p>
-                      <p className="text-xs text-muted-foreground">Overdue - Schedule immediately</p>
-                    </div>
-                    <Badge variant="destructive">Overdue</Badge>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 border rounded-lg bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
-                    <Clock className="h-4 w-4 text-yellow-600" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">CNC Lathe B</p>
-                      <p className="text-xs text-muted-foreground">Due in 3 days</p>
-                    </div>
-                    <Badge variant="secondary">Soon</Badge>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 border rounded-lg">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm">Conveyor System D</p>
-                      <p className="text-xs text-muted-foreground">Due in 8 days</p>
-                    </div>
-                    <Badge variant="outline">Scheduled</Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Cost Savings Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
-                  <DollarSign className="h-4 w-4 text-green-600" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-green-600">$2,340</div>
-                  <p className="text-xs text-muted-foreground">+18% from last month</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Downtime Reduced</CardTitle>
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-primary">23%</div>
-                  <p className="text-xs text-muted-foreground">Compared to last quarter</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Efficiency Gain</CardTitle>
-                  <Zap className="h-4 w-4 text-accent" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-accent">15%</div>
-                  <p className="text-xs text-muted-foreground">Production efficiency</p>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="machines" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Machine List */}
-              <Card className="lg:col-span-1">
-                <CardHeader>
-                  <CardTitle>Machine List</CardTitle>
-                  <CardDescription>Select a machine to view details</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  {machines.map((machine) => (
-                    <div
-                      key={machine.id}
-                      className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                        selectedMachine.id === machine.id ? "bg-primary/10 border-primary" : "hover:bg-muted"
-                      }`}
-                      onClick={() => setSelectedMachine(machine)}
-                    >
-                      <div className="flex items-center gap-3">
-                        {getStatusIcon(machine.status)}
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{machine.name}</p>
-                          <p className="text-xs text-muted-foreground">{machine.location}</p>
-                        </div>
-                        <Badge
-                          variant={
-                            machine.status === "healthy"
-                              ? "default"
-                              : machine.status === "attention"
-                                ? "secondary"
-                                : "destructive"
-                          }
-                        >
-                          {machine.health}%
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-
-              {/* Machine Details */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle>{selectedMachine.name}</CardTitle>
-                  <CardDescription>Detailed machine health and maintenance information</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Health Score */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium">Health Score</span>
-                      <span className="text-sm text-muted-foreground">{selectedMachine.health}%</span>
-                    </div>
-                    <Progress value={selectedMachine.health} className="h-2" />
-                  </div>
-
-                  {/* Status Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Status</p>
-                      <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${getStatusColor(selectedMachine.status)}`} />
-                        <span className="text-sm capitalize">{selectedMachine.status}</span>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Next Maintenance</p>
-                      <p className="text-sm text-muted-foreground">{selectedMachine.nextMaintenance}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Temperature</p>
-                      <p className="text-sm text-muted-foreground">{selectedMachine.temperature}°C</p>
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Vibration</p>
-                      <p className="text-sm text-muted-foreground">{selectedMachine.vibration}</p>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-2">
-                    <Button size="sm">
-                      <Wrench className="h-4 w-4 mr-2" />
-                      Schedule Maintenance
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      View History
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="maintenance" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Maintenance Schedule</CardTitle>
-                <CardDescription>AI-powered maintenance predictions and scheduling</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {machines.map((machine) => (
-                    <div key={machine.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-4 h-4 rounded-full ${getStatusColor(machine.status)}`} />
-                        <div>
-                          <p className="font-medium">{machine.name}</p>
-                          <p className="text-sm text-muted-foreground">Last service: {machine.lastService}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="text-sm font-medium">Next: {machine.nextMaintenance}</p>
-                          <p className="text-xs text-muted-foreground">Health: {machine.health}%</p>
-                        </div>
-                        <Button size="sm" variant={machine.status === "critical" ? "destructive" : "outline"}>
-                          {machine.status === "critical" ? "Urgent" : "Schedule"}
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="analytics" className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Cost Impact Analysis</CardTitle>
-                  <CardDescription>Financial benefits of predictive maintenance</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm">Maintenance Costs Saved</span>
-                      <span className="text-sm font-medium text-green-600">$8,420</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Downtime Costs Avoided</span>
-                      <span className="text-sm font-medium text-green-600">$15,680</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm">Emergency Repair Savings</span>
-                      <span className="text-sm font-medium text-green-600">$4,230</span>
-                    </div>
-                    <hr />
-                    <div className="flex justify-between font-medium">
-                      <span>Total Quarterly Savings</span>
-                      <span className="text-green-600">$28,330</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Performance Metrics</CardTitle>
-                  <CardDescription>Key performance indicators</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm">Overall Equipment Effectiveness</span>
-                        <span className="text-sm font-medium">87%</span>
-                      </div>
-                      <Progress value={87} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm">Predictive Accuracy</span>
-                        <span className="text-sm font-medium">94%</span>
-                      </div>
-                      <Progress value={94} className="h-2" />
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-sm">Maintenance Compliance</span>
-                        <span className="text-sm font-medium">78%</span>
-                      </div>
-                      <Progress value={78} className="h-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+      <StickyMobileCta />
     </div>
   )
 }
