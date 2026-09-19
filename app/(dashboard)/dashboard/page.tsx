@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { useQuery } from "@tanstack/react-query"
 import { formatDistanceToNow } from "date-fns"
 import { useSession, signOut } from "next-auth/react"
@@ -270,15 +271,16 @@ export default function DashboardPage() {
               </Card>
             </div>
 
-            <Card className="border-dashed">
+            <Card>
               <CardHeader>
                 <CardTitle>Cost Impact</CardTitle>
-                <CardDescription>
-                  <PlaceholderNotice>
-                    [PENDING — Economic Reports ship with the Economic Agent; see implementation plan Phase 5]
-                  </PlaceholderNotice>
-                </CardDescription>
+                <CardDescription>Compare run-to-failure loss against predictive maintenance cost.</CardDescription>
               </CardHeader>
+              <CardContent>
+                <Button asChild size="sm">
+                  <Link href="/economics">Open Economics</Link>
+                </Button>
+              </CardContent>
             </Card>
           </TabsContent>
 

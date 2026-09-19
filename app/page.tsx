@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -7,6 +8,7 @@ import { FaqAccordion } from "@/components/faq-accordion"
 import { CaseStudyCard } from "@/components/case-study-card"
 import { StickyMobileCta } from "@/components/sticky-mobile-cta"
 import { siteConfig } from "@/lib/site-config"
+import { Bot, DollarSign, Factory, Globe, LayoutDashboard, Zap } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "AfriMaint — AI Predictive Maintenance for African Manufacturers",
@@ -70,6 +72,22 @@ export default function HomePage() {
             {siteConfig.responseTimePromise}
           </p>
         </div>
+
+        <div className="mx-auto mt-12 max-w-5xl">
+          <div className="overflow-hidden rounded-2xl shadow-xl">
+            <Image
+              src="/hero-industrial-control-panel.jpg"
+              alt="Industrial control panel on a manufacturing production line"
+              width={1600}
+              height={900}
+              className="w-full object-cover"
+              priority
+            />
+          </div>
+          <p className="mt-2 text-right text-xs text-gray-400 dark:text-gray-500">
+            Photo by Homa Appliances on Unsplash
+          </p>
+        </div>
       </section>
 
       {/* Features Section */}
@@ -87,7 +105,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🤖</span>
+                <Bot className="h-6 w-6 text-primary" />
                 AI-Powered Detection
               </CardTitle>
             </CardHeader>
@@ -102,7 +120,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🏭</span>
+                <Factory className="h-6 w-6 text-primary" />
                 Industry Optimized
               </CardTitle>
             </CardHeader>
@@ -117,7 +135,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">⚡</span>
+                <Zap className="h-6 w-6 text-primary" />
                 Real-Time Monitoring
               </CardTitle>
             </CardHeader>
@@ -131,7 +149,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">💰</span>
+                <DollarSign className="h-6 w-6 text-primary" />
                 Cost Translated to KSH
               </CardTitle>
             </CardHeader>
@@ -146,7 +164,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">🌍</span>
+                <Globe className="h-6 w-6 text-primary" />
                 Local Context
               </CardTitle>
             </CardHeader>
@@ -160,7 +178,7 @@ export default function HomePage() {
           <Card className="transition-shadow hover:shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">📊</span>
+                <LayoutDashboard className="h-6 w-6 text-primary" />
                 Actionable Dashboards
               </CardTitle>
             </CardHeader>

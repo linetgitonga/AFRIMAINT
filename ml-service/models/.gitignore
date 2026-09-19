@@ -1,0 +1,6 @@
+# Trained model artifacts are handed off separately (see README.md in this folder) —
+# large binaries don't belong in git history. The fitted scaler + feature-column
+# contract are small, deterministic, and reproducible from the public AI4I dataset,
+# so those ARE tracked (see fit_scaler.py).
+ai4i_xgb.pkl
+vae_ai4i.pt

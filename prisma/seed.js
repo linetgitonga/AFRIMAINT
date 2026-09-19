@@ -19,6 +19,21 @@ async function main() {
     },
   })
 
+  await prisma.costMatrix.upsert({
+    where: { id: "demo-org-default-cost-matrix" },
+    update: {},
+    create: {
+      id: "demo-org-default-cost-matrix",
+      organizationId: organization.id,
+      name: "Default",
+      hourlyUnits: 50,
+      profitPerUnitKsh: 15,
+      dailyWageKsh: 1200,
+      shiftHours: 8,
+      emergencyPartsCostKsh: 5000,
+    },
+  })
+
   const passwordHash = hashSync(DEMO_PASSWORD, 10)
 
   const [manager, technician, admin] = await Promise.all([
@@ -56,6 +71,19 @@ async function main() {
       },
     }),
   ])
+
+  // Personal account for the project owner — own password, not the shared demo one.
+  await prisma.user.upsert({
+    where: { email: "linet@gmail.com" },
+    update: {},
+    create: {
+      organizationId: organization.id,
+      name: "Linet",
+      email: "linet@gmail.com",
+      passwordHash: hashSync("Test@123", 10),
+      role: "ADMIN",
+    },
+  })
 
   const machinesData = [
     {
@@ -164,11 +192,90 @@ async function main() {
     })
   }
 
+  // ModelVersion rows reflect the notebook's own reported metrics — including the
+  // components that do NOT meet their target and are explicitly not shipped. This
+  // feeds the Admin > Models honesty table (app/(dashboard)/admin/models/page.tsx)
+  // rather than presenting the concept note's claims as if all were validated.
+  const modelVersions = [
+    {
+      id: "xgb-classifier-ai4i-v1",
+      name: "AI4I XGBoost + SMOTE Classifier",
+      type: "CLASSIFIER",
+      isActive: false, // becomes true once ml-service/models/ai4i_xgb.pkl is provided
+      metrics: {
+        f1: 0.8599,
+        threshold: 0.93,
+        target: 0.8,
+        status: "beats target",
+        dataset: "AI4I 2020",
+      },
+    },
+    {
+      id: "weibull-vae-ai4i-v1",
+      name: "Weibull-VAE (unconditioned)",
+      type: "GENERATOR",
+      isActive: false, // becomes true once ml-service/models/vae_ai4i.pt is provided
+      metrics: {
+        frechetDistance: 0.0688,
+        frechetTarget: 0.15,
+        tstrF1Gap: 0.125,
+        tstrGapTarget: 0.05,
+        status: "Frechet PASS, TSTR gap FAILS own criterion",
+        usage: "augmentation/visualization only, not a standalone training substitute",
+      },
+    },
+    {
+      id: "cvae-cold-start-ai4i-v1",
+      name: "Conditional VAE (CVAE) cold-start",
+      type: "GENERATOR",
+      isActive: false, // intentionally never activated — see metrics.verdict
+      metrics: {
+        frechetDistance: 0.064,
+        vanillaVaeFrechetDistance: 0.031,
+        tstrF1: 0.301,
+        vanillaVaeTstrF1: 0.806,
+        verdict: "underperforms the unconditioned VAE on the notebook's own ablation — NOT shipped as the cold-start path",
+      },
+    },
+    {
+      id: "cold-start-k-sweep-ai4i-v1",
+      name: "Cold-start k-sweep (beta alternative)",
+      type: "CLASSIFIER",
+      isActive: false,
+      metrics: {
+        f1Range: "0.72-0.74",
+        coldStartTarget: 0.7,
+        status: "marginal pass, beta only",
+        note: "use instead of CVAE if a cold-start path must ship for the pilot; re-validate per real pilot machine type",
+      },
+    },
+    {
+      id: "wiener-rul-v1",
+      name: "Wiener-process RUL Estimator",
+      type: "RUL",
+      isActive: true, // fully implemented in ml-service, no trained artifact needed
+      metrics: {
+        weibullBeta: 1.974,
+        weibullEta: 187.7,
+        note: "population-level Weibull fit; single-snapshot AI4I data means every machine starts in the prior-dominated regime until real per-machine time series accumulate",
+      },
+    },
+  ]
+
+  for (const mv of modelVersions) {
+    await prisma.modelVersion.upsert({
+      where: { id: mv.id },
+      update: {},
+      create: mv,
+    })
+  }
+
   console.log("Seed complete.")
   console.log("Demo accounts (password for all: %s):", DEMO_PASSWORD)
   console.log("  Manager:    manager@afrimaint.local")
   console.log("  Technician: tech@afrimaint.local")
   console.log("  Admin:      admin@afrimaint.local")
+  console.log("  Owner:      linet@gmail.com (password: Test@123)")
 }
 
 main()

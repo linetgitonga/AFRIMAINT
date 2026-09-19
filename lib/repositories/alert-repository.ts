@@ -1,9 +1,10 @@
-import type { Alert } from "@prisma/client"
+import type { Alert, Prisma } from "@prisma/client"
 import { prisma } from "@/lib/db"
 
 export interface AlertRepository {
   listByOrganization(organizationId: string): Promise<Alert[]>
   updateStatus(id: string, organizationId: string, status: Alert["status"]): Promise<Alert | null>
+  create(data: Prisma.AlertUncheckedCreateInput): Promise<Alert>
 }
 
 class PrismaAlertRepository implements AlertRepository {
@@ -19,6 +20,10 @@ class PrismaAlertRepository implements AlertRepository {
     if (!alert) return null
 
     return prisma.alert.update({ where: { id }, data: { status } })
+  }
+
+  async create(data: Prisma.AlertUncheckedCreateInput): Promise<Alert> {
+    return prisma.alert.create({ data })
   }
 }
 

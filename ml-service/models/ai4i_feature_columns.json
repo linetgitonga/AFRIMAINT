@@ -1,0 +1,29 @@
+{
+  "feature_columns": [
+    "Air temperature",
+    "Process temperature",
+    "Rotational speed",
+    "Torque",
+    "Tool wear",
+    "Type_H",
+    "Type_L",
+    "Type_M",
+    "power_W",
+    "temp_delta",
+    "wear_torque",
+    "wear_speed",
+    "power_x_wear"
+  ],
+  "scaled_columns": [
+    "Air temperature",
+    "Process temperature",
+    "Rotational speed",
+    "Torque",
+    "Tool wear",
+    "power_W",
+    "temp_delta",
+    "wear_torque",
+    "wear_speed",
+    "power_x_wear"
+  ]
+}

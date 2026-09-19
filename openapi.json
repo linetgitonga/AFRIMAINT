@@ -1,0 +1,458 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "AfriMaint API",
+    "version": "0.1.0",
+    "description": "Contract for the Next.js API routes under app/api/. Frozen here so a future Django implementation (implementation plan Phase 6) can be validated against the same shapes before cutover."
+  },
+  "paths": {
+    "/api/contact": {
+      "post": {
+        "summary": "Submit a marketing-site inquiry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactForm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid submission"
+          }
+        }
+      }
+    },
+    "/api/auth/[...nextauth]": {
+      "post": {
+        "summary": "NextAuth credentials sign-in (email + password)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session established"
+          }
+        }
+      }
+    },
+    "/api/machines": {
+      "get": {
+        "summary": "List machines for the authenticated user's organization",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/machines/{id}": {
+      "get": {
+        "summary": "Get a single machine (must belong to the caller's organization)",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/alerts": {
+      "get": {
+        "summary": "List alerts for the authenticated user's organization",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/alerts/{id}": {
+      "patch": {
+        "summary": "Update an alert's status",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid status"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/api/work-orders": {
+      "get": {
+        "summary": "List work orders for the authenticated user's organization",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a work order (Manager/Admin only)",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "403": {
+            "description": "Forbidden — Manager/Admin only"
+          },
+          "404": {
+            "description": "Machine not found"
+          }
+        }
+      }
+    },
+    "/api/predict": {
+      "post": {
+        "summary": "Score a sensor reading via ml-service and persist the prediction",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Machine not found"
+          },
+          "502": {
+            "description": "ML service unavailable"
+          },
+          "503": {
+            "description": "ML service reachable but artifact not loaded"
+          }
+        }
+      }
+    },
+    "/api/economics": {
+      "get": {
+        "summary": "List recent economic reports for the organization",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "summary": "Compute a run-to-failure vs predictive-maintenance scenario and persist it",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EconomicScenario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Machine not found"
+          },
+          "409": {
+            "description": "No cost matrix configured"
+          }
+        }
+      }
+    },
+    "/api/admin/models": {
+      "get": {
+        "summary": "List model versions with their real reported metrics (Admin only)",
+        "security": [
+          {
+            "sessionCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "403": {
+            "description": "Forbidden — Admin only"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "sessionCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "next-auth.session-token"
+      }
+    },
+    "schemas": {
+      "ContactForm": {
+        "$ref": "#/definitions/ContactForm",
+        "definitions": {
+          "ContactForm": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "company": {
+                "anyOf": [
+                  {
+                    "anyOf": [
+                      {
+                        "not": {}
+                      },
+                      {
+                        "type": "string",
+                        "maxLength": 200
+                      }
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              },
+              "message": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 5000
+              },
+              "consent": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "name",
+              "email",
+              "message",
+              "consent"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "Login": {
+        "$ref": "#/definitions/Login",
+        "definitions": {
+          "Login": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "email",
+              "password"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PredictRequest": {
+        "$ref": "#/definitions/PredictRequest",
+        "definitions": {
+          "PredictRequest": {
+            "type": "object",
+            "properties": {
+              "machineId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reading": {
+                "type": "object",
+                "properties": {
+                  "airTemperature": {
+                    "type": "number"
+                  },
+                  "processTemperature": {
+                    "type": "number"
+                  },
+                  "rotationalSpeed": {
+                    "type": "number"
+                  },
+                  "torque": {
+                    "type": "number"
+                  },
+                  "toolWear": {
+                    "type": "number"
+                  },
+                  "machineType": {
+                    "type": "string",
+                    "enum": [
+                      "L",
+                      "M",
+                      "H"
+                    ]
+                  }
+                },
+                "required": [
+                  "airTemperature",
+                  "processTemperature",
+                  "rotationalSpeed",
+                  "torque",
+                  "toolWear",
+                  "machineType"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "machineId",
+              "reading"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "EconomicScenario": {
+        "$ref": "#/definitions/EconomicScenario",
+        "definitions": {
+          "EconomicScenario": {
+            "type": "object",
+            "properties": {
+              "machineId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "idleWorkers": {
+                "type": "number",
+                "minimum": 0
+              },
+              "runToFailureDowntimeHours": {
+                "type": "number",
+                "minimum": 0
+              },
+              "predictiveDowntimeHours": {
+                "type": "number",
+                "minimum": 0
+              },
+              "preventiveMaintenanceCostKsh": {
+                "type": "number",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "machineId",
+              "idleWorkers",
+              "runToFailureDowntimeHours",
+              "predictiveDowntimeHours",
+              "preventiveMaintenanceCostKsh"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}
